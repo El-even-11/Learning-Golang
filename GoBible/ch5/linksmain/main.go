@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	urls := os.Args[1:]
+	// urls := os.Args[1:]
+	urls := []string{"https://www.vilipix.com/"}
 	for _, url := range urls {
 		links, err := links.Extract(url)
 		if err != nil {
