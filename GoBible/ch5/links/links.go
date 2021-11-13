@@ -23,28 +23,19 @@ func Extract(url string) ([]string, error) {
 	}
 	var links []string
 	visitNode := func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "img" {
+		if n.Type == html.ElementNode && n.Data == "a" {
 			for _, a := range n.Attr {
-				if a.Key != "src" {
+				if a.Key != "href" {
 					continue
 				}
-				link := a.Val
-				links = append(links, link)
+				link, err := resp.Request.URL.Parse(a.Val)
+				if err != nil {
+					continue
+				}
+				links = append(links, link.String())
 			}
 		}
 	}
-
-	// visitNode := func(n *html.Node) {
-	// 	if n.Type == html.ElementNode && n.Data == "img" {
-	// 		attrs := make(map[string]string)
-	// 		for _, a := range n.Attr {
-	// 			attrs[a.Key] = a.Val
-	// 		}
-	// 		if attrs["class"] == "el-image__inner" {
-	// 			links = append(links, attrs["src"])
-	// 		}
-	// 	}
-	// }
 
 	forEachNode(doc, visitNode, nil)
 	return links, nil
