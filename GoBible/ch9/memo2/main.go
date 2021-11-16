@@ -1,12 +1,13 @@
 package main
 
 import (
-	"Learning-Golang/GoBible/ch9/memo1/memo"
+	"Learning-Golang/GoBible/ch9/memo2/memo"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,7 @@ func httpGetBody(url string) (interface{}, error) {
 
 func main() {
 	m := memo.New(httpGetBody)
+	var wg sync.WaitGroup
 
 	incomingURLs := make(chan string)
 
@@ -34,12 +36,17 @@ func main() {
 	Start := time.Now()
 
 	for url := range incomingURLs {
-		value, err := m.Get(url)
-		if err != nil {
-			log.Println(err)
-		}
-		fmt.Printf("%s, %d bytes\n", url, len(value.([]byte)))
+		wg.Add(1)
+		go func(url string) {
+			value, err := m.Get(url)
+			if err != nil {
+				log.Println(err)
+			}
+			fmt.Printf("%s, %d bytes\n", url, len(value.([]byte)))
+			wg.Done()
+		}(url)
 	}
 
+	wg.Wait()
 	fmt.Printf("completed in %s.\n", time.Since(Start))
 }
