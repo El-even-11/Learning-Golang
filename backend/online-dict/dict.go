@@ -96,6 +96,7 @@ func query(word string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println(bodyText)
 
 	var response DictResponse
 	err = json.Unmarshal(bodyText, &response)
